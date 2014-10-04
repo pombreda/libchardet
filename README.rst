@@ -11,7 +11,7 @@ Check the ``chardet.h`` header and have fun.
 Installation
 ############
 
-libchardet uses the `waf <https://code.google.com/p/waf/>_` build tool,
+libchardet uses the `waf <https://code.google.com/p/waf/>`_ build tool,
 which also embeds Python scripts used to generate sources.
 
 It is chosen not to embed the packaged waf here, but rather, tell users
