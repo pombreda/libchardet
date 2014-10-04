@@ -3,6 +3,27 @@ libchardet, a Character Encoding Detection Library
 ##################################################
 
 
+As of 2014, not all text files are yet in UTF-8 (best thing since the wheel),
+and character encoding detection is necessary.
+This library is a reimplementation of universal character detection,
+AFAICT pioneered by Netscape in their ``nsUniversalDetector`` piece of code,
+which has been widely reused.
+The goal is to make it more transparent and hackable, with less dependencies,
+a clear API, and available to the world.
+
+
+License
+#######
+
+libchardet uses the Mozilla Public License v2.0 (see ``LICENSE`` file which is
+attached with the sources or the more readable https://www.mozilla.org/MPL/2.0/).
+The goal is to permit any use, but making sure that distributed modifications
+are back upstream.
+The Exhibit A (source code form license notice) is deliberately not put
+in each file in the sources, to save bytes, and all upstreamed contributions
+are to be tracked with the VCS system.
+
+
 Usage
 #####
 
