@@ -12,6 +12,8 @@ def configure(conf):
 
 	if conf.env.CXX_NAME in ('gcc', 'clang'):
 		conf.env.CXXFLAGS += [ '-std=c++11' ]
+	if conf.env.CC_NAME in ('gcc', 'clang'):
+		conf.env.CFLAGS += [ '-std=c99' ]
 
 def build(bld):
 	bld(
@@ -19,17 +21,26 @@ def build(bld):
 	 features='cxx cxxshlib',
 	 source=[
 	  'chardet.cpp',
+	  'chardet-c.cpp',
 	 ],
 	 install_path="${LIBDIR}",
 	)
 
 	bld.install_files("${PREFIX}/include/libchardet",
-	 ['chardet.hpp'])
+	 ['chardet.hpp', 'chardet.h'])
 
 	bld(
 	 target='chardet-test',
 	 features='cxx cxxprogram',
 	 source='chardet-test.cpp',
+	 use='chardet',
+	 rpath='${ORIGIN}',
+	)
+
+	bld(
+	 target='chardet-c-test',
+	 features='c cprogram',
+	 source='chardet-c-test.c',
 	 use='chardet',
 	 rpath='${ORIGIN}',
 	)

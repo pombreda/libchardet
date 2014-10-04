@@ -10,12 +10,10 @@ int main()
 
 	c.feed("Hello World");
 
-	std::vector<std::pair<char const *, float>> stats;
-
-	c.get_probabilities(stats);
+	Chardet::Detector::Stats const * stats = c.get_probabilities();
 
 	printf("Probabilities:\n");
-	for (auto & kv : stats) {
+	for (auto & kv : *stats) {
 		printf(" - %s: %5.3f\n", kv.first, kv.second);
 	}
 

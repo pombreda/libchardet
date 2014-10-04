@@ -12,7 +12,11 @@
 namespace Chardet {
 
 class Detector {
+ public:
+	typedef std::pair<char const *, float> Stat;
+	typedef std::vector<Stat> Stats;
  private:
+	Stats stats;
 
  public:
 	Detector();
@@ -29,7 +33,7 @@ class Detector {
 
 	/*! Retrieve current probabilities
 	 */
-	void get_probabilities(std::vector<std::pair<char const *, float>> & stats) const;
+	const Stats * get_probabilities() const;
 
 	//! \}
 

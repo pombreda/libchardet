@@ -14,6 +14,8 @@ using namespace Chardet;
 
 Detector::Detector()
 {
+	stats.clear();
+	stats.push_back(std::pair<char const *, float>("utf-8", 0.1));
 }
 
 Detector::~Detector()
@@ -24,8 +26,7 @@ void Detector::feed(char const * data, size_t nbytes)
 {
 }
 
-void Detector::get_probabilities(std::vector<std::pair<char const *, float>> & stats) const
+const Detector::Stats * Detector::get_probabilities() const
 {
-	stats.push_back(std::pair<char const *, float>("utf-8", 0.1));
+	return &stats;
 }
-
