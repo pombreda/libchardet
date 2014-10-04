@@ -1,0 +1,9 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+incdir=${prefix}/include
+
+Name: libchardet
+Description: Character Encoding Detection Library
+Version: 0.1
+Libs: -L${libdir} -lchardet
+Cflags: -I${incdir}/libchardet

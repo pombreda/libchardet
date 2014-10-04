@@ -1,0 +1,36 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+def options(opt):
+	opt.load('compiler_c')
+	opt.load('compiler_cxx')
+
+
+def configure(conf):
+	conf.load('compiler_c')
+	conf.load('compiler_cxx')
+
+	if conf.env.CXX_NAME in ('gcc', 'clang'):
+		conf.env.CXXFLAGS += [ '-std=c++11' ]
+
+def build(bld):
+	bld(
+	 target='chardet',
+	 features='cxx cxxshlib',
+	 source=[
+	  'chardet.cpp',
+	 ],
+	 install_path="${LIBDIR}",
+	)
+
+	bld.install_files("${PREFIX}/include/libchardet",
+	 ['chardet.hpp'])
+
+	bld(
+	 target='chardet-test',
+	 features='cxx cxxprogram',
+	 source='chardet-test.cpp',
+	 use='chardet',
+	 rpath='${ORIGIN}',
+	)
+
