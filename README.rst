@@ -69,3 +69,21 @@ It is chosen not to keep generated code in the sources, but rather to manage
 to produce intermediate files during the build process.
 
 
+References
+##########
+
+A well known library that does character encoding detection is gecko
+(Netscape/Mozilla):
+http://lxr.mozilla.org/seamonkey/source/extensions/universalchardet/
+The algorithm is described at:
+http://www-archive.mozilla.org/projects/intl/UniversalCharsetDetection.html
+
+The Netscape code is forked at:
+https://code.google.com/p/uchardet/
+(https://github.com/BYVoid/uchardet)
+
+
+Another library is libenca:
+https://github.com/nijel/enca/
+This library uses recode / iconv to try and parse text.
+
