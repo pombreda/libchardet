@@ -75,17 +75,37 @@ void Detector::feed(char const * data, size_t nbytes)
 		iconv_t cd = iconv_open(encoding, "UTF-8");
 		char * addr = const_cast<char*>(data);
 		size_t len = nbytes;
-		char out_buf[32];
+		char out_buf[3200];
 		char * outptr;
 		size_t outlen;
-		while (len > 0) {
+		size_t block = 0;
+		size_t done = 0;
+		while (done < nbytes) {
+			size_t todo = len = min(nbytes - done, sizeof(out_buf));
+			addr = const_cast<char*>(&data[done]);
 			outptr = &out_buf[0];
 			outlen = sizeof(out_buf);
+
+			//fprintf(stderr, "%.32s %s block=%zu/%zu/%zu %p",
+			// addr, encoding, block, len, nbytes, addr);
+
 			res = iconv(cd, &addr, &len, &outptr, &outlen);
+
+			//fprintf(stderr, " res=%d after=%zu outlen=%zu\n",
+			// res, len, outlen);
+			//if (res == -1) {
+			//	perror("pouet");
+			//}
+
 			if (res == -1) {
 				m->probas[encoding] = 0.0;
 				break;
 			}
+			else {
+				m->probas[encoding] = 0.5;
+			}
+			done += (todo-len);
+			block++;
 		}
 		if (len == 0) {
 			m->probas[encoding] = 1.0;
