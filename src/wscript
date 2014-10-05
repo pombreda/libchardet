@@ -22,7 +22,11 @@ def configure(conf):
 		conf.find_program('iconv')
 		if conf.env.ICONV:
 			out = conf.cmd_and_log(conf.env.ICONV + ['-l'])
-			encodings = ", ".join([('"%s"' % x.replace("//", "")) for x in out.splitlines()])
+			encodings = out.splitlines()
+			for i, enc in enumerate(encodings):
+				enc = enc.replace('///', '').replace('//', '').replace('/', '')
+				encodings[i] = '"%s"' % enc
+			encodings = ", ".join(encodings)
 			conf.env.DEFINES_ICONV += ['ICONV_ENCODINGS={%s}' % encodings]
 
 def build(bld):
