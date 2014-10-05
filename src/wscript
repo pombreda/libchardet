@@ -52,6 +52,7 @@ def build(bld):
 	 source='chardet-test.cpp',
 	 use='chardet',
 	 rpath='${ORIGIN}',
+	 install_path=None,
 	)
 
 	bld(
@@ -60,5 +61,6 @@ def build(bld):
 	 source='chardet-c-test.c',
 	 use='chardet',
 	 rpath='${ORIGIN}',
+	 install_path=None,
 	)
 
