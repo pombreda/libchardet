@@ -5,9 +5,9 @@ libchardet, a Character Encoding Detection Library
 
 As of 2014, not all text files are yet in UTF-8 (best thing since the wheel),
 and character encoding detection is necessary.
-This library is a reimplementation of universal character detection,
-AFAICT pioneered by Netscape in their ``nsUniversalDetector`` piece of code,
-which has been widely reused.
+This library is a reimplementation of universal character encoding detection
+(aka charset sniffing), AFAICT pioneered by Netscape/Mozilla in their browser
+via the ``nsUniversalDetector`` library, which has been widely reused.
 The goal is to make it more transparent and hackable, with less dependencies,
 a clear API, and available to the world.
 
@@ -69,8 +69,47 @@ It is chosen not to keep generated code in the sources, but rather to manage
 to produce intermediate files during the build process.
 
 
+Design Notes
+############
+
+This library assumes that Unicode is a super-set of all code pages and other
+character encodings.
+Thus, a first pass of eliminating the potentially incompatible encodings
+is performed using Unicode libraries.
+If available on the system, ``iconv`` and ``ICU`` will be used.
+
+Then, to guess which encoding is used, between the potential results obtained
+on the first pass, an analysis is performed, determining what is the
+probability of the text being something else than random characters which
+happen to be valid in the candidate encoding.
+Strategies are used, such as frequency analysis, and result in the refinement
+of the score of the candidate encodings.
+
+Tables of probabilities are used to perform the second pass; a design goal
+of this library is to have the tables generated during compile-time instead
+of hard-coded in the sources.
+
+
+Limitations
+***********
+
+It is sometimes found in e-mails that parts of a text are in an encoding,
+and other ones are not, and this library doesn't handle that.
+If the two encodings are incompatible, then the library will decide that
+the result is none of the two.
+
+As of v0.1, the whole text needs to be fed in the library, and the detector
+cannot be reset. It's not that expensive anyway, given the purpose of the
+library. But this limitation is only due to lack of development resources and
+motivation, so don't hesitate to contribute, discuss the API, etc.
+
+
 References
 ##########
+
+
+Other Character Encoding Detection Implementations
+**************************************************
 
 A well known library that does character encoding detection is gecko
 (Netscape/Mozilla):
@@ -86,4 +125,12 @@ https://code.google.com/p/uchardet/
 Another library is libenca:
 https://github.com/nijel/enca/
 This library uses recode / iconv to try and parse text.
+
+
+Character Encodings and Unicode
+*******************************
+
+Here's a short intro to Unicode:
+http://www.w3.org/International/articles/definitions-characters/
+
 
