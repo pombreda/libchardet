@@ -15,6 +15,16 @@ def configure(conf):
 	if conf.env.CC_NAME in ('gcc', 'clang'):
 		conf.env.CFLAGS += [ '-std=c99' ]
 
+	conf.check(header_name='iconv.h',
+	 features='cxx cxxprogram', mandatory=False)
+
+	if 'HAVE_ICONV_H=1' in conf.env.DEFINES:
+		conf.find_program('iconv')
+		if conf.env.ICONV:
+			out = conf.cmd_and_log(conf.env.ICONV + ['-l'])
+			encodings = ", ".join([('"%s"' % x.replace("//", "")) for x in out.splitlines()])
+			conf.env.DEFINES_ICONV += ['ICONV_ENCODINGS={%s}' % encodings]
+
 def build(bld):
 	bld(
 	 target='chardet',
@@ -23,11 +33,12 @@ def build(bld):
 	  'chardet.cpp',
 	  'chardet-c.cpp',
 	 ],
+	 use='ICONV',
 	 install_path="${LIBDIR}",
 	)
 
 	bld.install_files("${PREFIX}/include/libchardet",
-	 ['chardet.hpp', 'chardet.h'])
+	 ['chardet.hpp', 'chardet_pimpl_h.hpp', 'chardet.h'])
 
 	bld(
 	 target='chardet-test',

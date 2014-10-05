@@ -9,6 +9,8 @@
 #include <vector>
 #include <string>
 
+#include "chardet_pimpl_h.hpp"
+
 namespace Chardet {
 
 class Detector {
@@ -16,7 +18,8 @@ class Detector {
 	typedef std::pair<char const *, float> Stat;
 	typedef std::vector<Stat> Stats;
  private:
-	Stats stats;
+	class impl;
+	pimpl<impl> m;
 
  public:
 	Detector();
