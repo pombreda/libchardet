@@ -24,18 +24,34 @@ def configure(conf):
 	 uselib_store="ICU", mandatory=False)
 
 	if 'HAVE_ICONV_H=1' in conf.env.DEFINES:
-		conf.find_program('iconv')
-		if conf.env.ICONV:
-			out = conf.cmd_and_log(conf.env.ICONV + ['-l'])
-			encodings = out.splitlines()
-			for i, enc in enumerate(encodings):
-				enc = enc.replace('///', '').replace('//', '').replace('/', '')
-				encodings[i] = '"%s"' % enc
-			encodings = ", ".join(encodings)
-			conf.env.DEFINES_ICONV += ['ICONV_ENCODINGS={%s}' % encodings]
+		conf.find_program('iconv', mandatory=False)
+	if conf.env.ICONV:
+		out = conf.cmd_and_log(conf.env.ICONV + ['-l'])
+		encodings = out.splitlines()
+		for i, enc in enumerate(encodings):
+			enc = enc.replace('///', '').replace('//', '').replace('/', '')
+			encodings[i] = '"%s"' % enc
+		encodings = ", ".join(encodings)
+		conf.env.DEFINES_ICONV += ['ICONV_ENCODINGS={%s}' % encodings]
+		conf.msg("iconv encodings", encodings)
 
-	if 'HAVE_ICU' in conf.env.define_key:
-		pass
+	if conf.env.DEFINES_ICU:
+		frag_icu_encodings = r"""
+		#include <stdio.h>
+		#include <unicode/ucnv.h>
+		int main() {
+			int n_convs = ucnv_countAvailable();
+			for (int idx_conv = 0; idx_conv < n_convs; idx_conv++) {
+				char const * name = ucnv_getAvailableName(idx_conv);
+				printf("%s\n", name);
+			}
+			return 0;
+		}
+		"""
+		out = conf.check(fragment=frag_icu_encodings,
+		 features='c cprogram', use="ICU", define_ret=True, execute=True)
+		encodings = out.decode().splitlines()
+		conf.msg("ICU encodings", ", ".join(encodings))
 
 def build(bld):
 	bld(
