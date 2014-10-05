@@ -4,6 +4,7 @@
 
 */
 
+#include <cstring>
 #include <string>
 #include <stdexcept>
 #include <unordered_map>
@@ -13,6 +14,10 @@
 
 #if defined(HAVE_ICONV_H)
 # include <iconv.h>
+#endif
+
+#if defined(HAVE_ICU)
+# include <unicode/ucnv.h>
 #endif
 
 #include "chardet.hpp"
@@ -25,7 +30,7 @@ using namespace Chardet;
 class Detector::impl {
  public:
 	Stats stats;
-	unordered_map<char const *, float> probas;
+	unordered_map<string, float> probas;
 #if defined(HAVE_ICONV_H)
 	vector<char const *> iconv_encodings;
 #endif
@@ -44,6 +49,14 @@ Detector::impl::impl()
 #if defined(HAVE_ICONV_H)
 	for (auto & e: iconv_encodings) {
 		probas[e] = 0.001;
+	}
+#endif
+
+#if defined(HAVE_ICU)
+	int n_convs = ucnv_countAvailable();
+	for (int idx_conv = 0; idx_conv < n_convs; idx_conv++) {
+		char const * name = ucnv_getAvailableName(idx_conv);
+		probas[name] = 0.01;
 	}
 #endif
 
@@ -69,6 +82,40 @@ Detector::~Detector()
 void Detector::feed(char const * data, size_t nbytes)
 {
 	int res;
+
+#if defined(HAVE_ICU)
+	{
+		int n_convs = ucnv_countAvailable();
+		for (int idx_conv = 0; idx_conv < n_convs; idx_conv++) {
+			char const * name = ucnv_getAvailableName(idx_conv);
+
+			if (strstr(name, "2022") != NULL) {
+				continue;
+			}
+
+			UErrorCode errorCode = U_ZERO_ERROR;
+			UConverter *conv = ucnv_open(name, &errorCode);
+			if (conv == NULL) {
+				continue;
+			}
+
+			int32_t tcap = nbytes*4;
+			char * target = new char[tcap];
+			int32_t scap = nbytes;
+			char const * src = data;
+
+			ucnv_convert("UTF-32", name, target, tcap, src, scap, &errorCode);
+
+			delete [] target;
+
+			ucnv_close(conv);
+
+			if (errorCode == U_ZERO_ERROR) {
+				m->probas[name] = 1.0;
+			}
+		}
+	}
+#endif
 
 #if defined(HAVE_ICONV_H)
 	for (char const * encoding: m->iconv_encodings) {
@@ -116,7 +163,9 @@ void Detector::feed(char const * data, size_t nbytes)
 
 	int i = 0;
 	for (auto & kv : m->probas) {
-		m->stats[i++] = kv;
+		m->stats[i].first = kv.first.c_str();
+		m->stats[i].second = kv.second;
+		i++;
 	}
 
 	auto by_decreasing_proba = [](Stat const & a, Stat const & b) -> bool
