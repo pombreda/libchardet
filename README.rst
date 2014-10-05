@@ -89,6 +89,24 @@ Tables of probabilities are used to perform the second pass; a design goal
 of this library is to have the tables generated during compile-time instead
 of hard-coded in the sources.
 
+.. note:: As of 2014-10-05 the second pass is TODO
+
+
+Use of iconv
+************
+
+TODO
+
+
+Use of ICU
+**********
+
+ICU is an IBM library and uses alternate encoding names (mostly ``ibm-*``)
+for a lot of character sets; we try to use the standard names, so we translate
+them when using ICU.
+
+.. note:: As of 2014-10-05 this is not done
+
 
 Limitations
 ***********
